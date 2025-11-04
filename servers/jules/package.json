@@ -1,0 +1,24 @@
+{
+  "name": "jules-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server that bridges Claude Code to Jules API for parallel task execution",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": [
+    "mcp",
+    "jules",
+    "ai",
+    "task-execution",
+    "parallel"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "node-fetch": "^3.3.2"
+  }
+}

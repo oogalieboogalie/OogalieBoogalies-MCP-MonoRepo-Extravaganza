@@ -1,0 +1,23 @@
+{
+  "name": "mcp-servers",
+  "version": "1.0.0",
+  "description": "oogalieboogalie's collection of MCP servers for AI orchestration and parallel execution",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oogalieboogalie/mcp-servers.git"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "jules",
+    "automation",
+    "parallel-execution",
+    "orchestration"
+  ],
+  "author": "oogalieboogalie",
+  "license": "MIT",
+  "scripts": {
+    "install-all": "cd servers/jules && npm install"
+  }
+}
