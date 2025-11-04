@@ -20,7 +20,7 @@ Instead of Claude doing everything sequentially, Claude can now say:
 ## Installation
 
 ```bash
-cd D:\Git Projects\JulesO2G\mcp-server
+cd servers/jules
 npm install
 ```
 
@@ -50,7 +50,7 @@ Add this MCP server to your Claude Code configuration:
   "mcpServers": {
     "jules": {
       "command": "node",
-      "args": ["D:\\Git Projects\\JulesO2G\\mcp-server\\index.js"],
+      "args": ["/path/to/mcp-servers/servers/jules/index.js"],
       "env": {
         "JULES_API_KEY": "your_jules_api_key_here"
       }
