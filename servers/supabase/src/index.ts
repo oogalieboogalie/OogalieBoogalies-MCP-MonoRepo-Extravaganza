@@ -15,54 +15,146 @@ const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
 });
 
+// Helper to accept both native objects and JSON strings
+const flexibleObject = z.union([
+  z.record(z.any()),  // Native object
+  z.string().transform((str, ctx) => {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid JSON string",
+      });
+      return z.NEVER;
+    }
+  })
+]);
+
+const flexibleArray = z.union([
+  z.array(z.any()),  // Native array
+  z.string().transform((str, ctx) => {
+    try {
+      const parsed = JSON.parse(str);
+      if (!Array.isArray(parsed)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Expected array",
+        });
+        return z.NEVER;
+      }
+      return parsed;
+    } catch (e) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid JSON string",
+      });
+      return z.NEVER;
+    }
+  })
+]);
+
 // Tool schemas
 const createTableSchema = z.object({
   tableName: z.string(),
-  columns: z.array(z.object({
-    name: z.string(),
-    type: z.string(),
-    nullable: z.boolean().optional(),
-    default: z.string().optional(),
-    primaryKey: z.boolean().optional(),
-    unique: z.boolean().optional(),
-    references: z.object({
-      table: z.string(),
-      column: z.string(),
-      onDelete: z.enum(['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION']).optional(),
-    }).optional(),
-  })),
-  indexes: z.array(z.object({
-    name: z.string(),
-    columns: z.array(z.string()),
-    unique: z.boolean().optional(),
-  })).optional(),
+  columns: z.union([
+    z.array(z.object({
+      name: z.string(),
+      type: z.string(),
+      nullable: z.boolean().optional(),
+      default: z.string().optional(),
+      primaryKey: z.boolean().optional(),
+      unique: z.boolean().optional(),
+      references: z.object({
+        table: z.string(),
+        column: z.string(),
+        onDelete: z.enum(['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION']).optional(),
+      }).optional(),
+    })),
+    z.string().transform((str, ctx) => {
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Invalid JSON string for columns",
+        });
+        return z.NEVER;
+      }
+    })
+  ]),
+  indexes: z.union([
+    z.array(z.object({
+      name: z.string(),
+      columns: z.array(z.string()),
+      unique: z.boolean().optional(),
+    })),
+    z.string().transform((str, ctx) => {
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Invalid JSON string for indexes",
+        });
+        return z.NEVER;
+      }
+    })
+  ]).optional(),
 });
 
 const querySchema = z.object({
   table: z.string(),
   select: z.string().optional(),
-  filter: z.record(z.any()).optional(),
-  order: z.object({
-    column: z.string(),
-    ascending: z.boolean().optional(),
-  }).optional(),
+  filter: flexibleObject.optional(),
+  order: z.union([
+    z.object({
+      column: z.string(),
+      ascending: z.boolean().optional(),
+    }),
+    z.string().transform((str, ctx) => {
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Invalid JSON string for order",
+        });
+        return z.NEVER;
+      }
+    })
+  ]).optional(),
   limit: z.number().optional(),
 });
 
 const insertSchema = z.object({
   table: z.string(),
-  data: z.union([z.record(z.any()), z.array(z.record(z.any()))]),
+  data: z.union([
+    z.record(z.any()),  // Native object
+    z.array(z.record(z.any())),  // Native array of objects
+    z.string().transform((str, ctx) => {  // JSON string
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Invalid JSON string for data",
+        });
+        return z.NEVER;
+      }
+    })
+  ]),
 });
 
 const updateSchema = z.object({
   table: z.string(),
-  filter: z.record(z.any()),
-  data: z.record(z.any()),
+  filter: flexibleObject,
+  data: flexibleObject,
 });
 
 const deleteSchema = z.object({
   table: z.string(),
-  filter: z.record(z.any()),
+  filter: flexibleObject,
 });
 
 const createRLSPolicySchema = z.object({
@@ -361,7 +453,7 @@ class SupabaseMCPServer {
     const { tableName, columns, indexes } = args;
 
     // Build CREATE TABLE statement
-    const columnDefs = columns.map((col) => {
+    const columnDefs = columns.map((col: any) => {
       let def = `"${col.name}" ${col.type}`;
       if (col.primaryKey) def += " PRIMARY KEY";
       if (col.unique) def += " UNIQUE";
@@ -383,7 +475,7 @@ class SupabaseMCPServer {
     if (indexes) {
       for (const index of indexes) {
         const uniqueStr = index.unique ? "UNIQUE" : "";
-        const indexSql = `CREATE ${uniqueStr} INDEX "${index.name}" ON "${tableName}" (${index.columns.map(c => `"${c}"`).join(", ")})`;
+        const indexSql = `CREATE ${uniqueStr} INDEX "${index.name}" ON "${tableName}" (${index.columns.map((c: any) => `"${c}"`).join(", ")})`;
         const { error: indexError } = await this.supabase.rpc("exec_sql_plpgsql", { p_sql: indexSql, p_params: {} });
         if (indexError) throw indexError;
       }
