@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "jules": {
+      "command": "node",
+      "args": ["/path/to/mcp-servers/servers/jules/index.js"],
+      "env": {
+        "JULES_API_KEY": "your_jules_api_key_here"
+      }
+    },
+    "supabase": {
+      "command": "node",
+      "args": ["/path/to/mcp-servers/servers/supabase/dist/index.js"],
+      "env": {
+        "SUPABASE_URL": "https://your-project.supabase.co",
+        "SUPABASE_SERVICE_ROLE_KEY": "your_service_role_key_here"
+      }
+    }
+  }
+}

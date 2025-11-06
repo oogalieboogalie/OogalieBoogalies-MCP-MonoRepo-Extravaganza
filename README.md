@@ -98,7 +98,11 @@ cp servers/supabase/.env.example servers/supabase/.env
 # Edit and add: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
 ```
 
-### 4. Configure Claude Desktop
+### 4. Configure Your MCP Client
+
+Choose your preferred MCP client:
+
+#### Option A: Claude Desktop
 
 Edit your Claude Desktop config file:
 
@@ -121,15 +125,40 @@ Add the servers you want:
 }
 ```
 
-### 5. Restart Claude Desktop
+#### Option B: GitHub Copilot (VS Code)
 
-That's it! Your MCP servers are now available in Claude Desktop.
+Edit your VS Code MCP config file:
+
+**Windows:** `%APPDATA%\Code\User\globalStorage\github.copilot-chat\mcp.json`
+**Mac:** `~/Library/Application Support/Code/User/globalStorage/github.copilot-chat/mcp.json`
+**Linux:** `~/.config/Code/User/globalStorage/github.copilot-chat/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "jules": {
+      "command": "node",
+      "args": ["/absolute/path/to/repo/servers/jules/index.js"],
+      "env": {
+        "JULES_API_KEY": "your_jules_api_key_here"
+      }
+    }
+  }
+}
+```
+
+📖 **[Full GitHub Copilot Setup Guide](./docs/github-copilot-setup.md)**
+
+### 5. Restart Your MCP Client
+
+Restart Claude Desktop or VS Code to load the MCP servers.
 
 ---
 
 ## 📚 Configuration Examples
 
-See [examples/claude_desktop_config.json](./examples/claude_desktop_config.json) for a complete configuration with all available servers.
+- **Claude Desktop:** [examples/claude_desktop_config.json](./examples/claude_desktop_config.json)
+- **GitHub Copilot:** [examples/vscode_mcp.json](./examples/vscode_mcp.json)
 
 ---
 
@@ -152,9 +181,13 @@ Found a bug? Have an idea for a new MCP server? PRs welcome!
 
 ## 📖 Documentation
 
+### MCP Servers
 - [Jules MCP Server](./servers/jules/README.md)
 - [Supabase MCP Server](./servers/supabase/README.md)
-- [Configuration Guide](./docs/configuration.md)
+
+### Setup Guides
+- [GitHub Copilot Setup Guide](./docs/github-copilot-setup.md) - **Use with VS Code & GitHub Copilot**
+- [Claude Desktop Configuration](./examples/claude_desktop_config.json) - Use with Claude Desktop
 
 ---
 
