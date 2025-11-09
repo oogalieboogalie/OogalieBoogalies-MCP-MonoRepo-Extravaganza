@@ -58,6 +58,29 @@ Manage your Supabase database directly from AI. Create tables, query data, set u
 
 ---
 
+### 🎨 MiniMax MCP Server
+**Multimodal Generation (Image, Audio, Video, Music)**
+
+Create images, audio, video, and music from text prompts. Perfect for creative workflows and generating assets on the fly.
+
+**Features:**
+- ✅ Text-to-Image with multiple aspect ratios
+- ✅ Text-to-Audio with multiple voices and languages
+- ✅ Text-to-Video and Image-to-Video
+- ✅ Music Generation from lyrics and prompts
+- ✅ Local file saving or URL returns
+
+**Tools:**
+- `text_to_image` - Generate an image
+- `text_to_audio` - Generate audio
+- `generate_video` - Generate a video from text
+- `query_video_generation` - Check the status of a video generation task
+- `music_generation` - Generate music
+
+[📖 Full Documentation](./servers/minimax-mcp/README.md)
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Clone the Repo
@@ -84,6 +107,9 @@ npm install
 npm run build  # Supabase needs to be compiled
 ```
 
+**MiniMax:**
+No installation needed, the server is run via `npx`.
+
 ### 3. Set Up Environment Variables
 
 **Jules:**
@@ -96,6 +122,13 @@ cp servers/jules/.env.example servers/jules/.env
 ```bash
 cp servers/supabase/.env.example servers/supabase/.env
 # Edit and add: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
+```
+
+**MiniMax:**
+```bash
+# No .env file, use environment variables directly:
+# MINIMAX_API_KEY
+# MINIMAX_MCP_BASE_PATH (optional, defaults to ~/Desktop/minimax-mcp-output)
 ```
 
 ### 4. Configure Your MCP Client
@@ -120,6 +153,14 @@ Add the servers you want:
       "env": {
         "JULES_API_KEY": "your_jules_api_key_here"
       }
+    },
+    "minimax": {
+      "command": "npx",
+      "args": ["-y", "minimax-mcp-js"],
+      "env": {
+        "MINIMAX_API_KEY": "${MINIMAX_API_KEY}",
+        "MINIMAX_MCP_BASE_PATH": "~/Desktop"
+      }
     }
   }
 }
@@ -141,6 +182,14 @@ Edit your VS Code MCP config file:
       "args": ["/absolute/path/to/repo/servers/jules/index.js"],
       "env": {
         "JULES_API_KEY": "your_jules_api_key_here"
+      }
+    },
+    "minimax": {
+      "command": "npx",
+      "args": ["-y", "minimax-mcp-js"],
+      "env": {
+        "MINIMAX_API_KEY": "${MINIMAX_API_KEY}",
+        "MINIMAX_MCP_BASE_PATH": "~/Desktop"
       }
     }
   }
@@ -184,6 +233,7 @@ Found a bug? Have an idea for a new MCP server? PRs welcome!
 ### MCP Servers
 - [Jules MCP Server](./servers/jules/README.md)
 - [Supabase MCP Server](./servers/supabase/README.md)
+- [MiniMax MCP Server](./servers/minimax-mcp/README.md)
 
 ### Setup Guides
 - [GitHub Copilot Setup Guide](./docs/github-copilot-setup.md) - **Use with VS Code & GitHub Copilot**
